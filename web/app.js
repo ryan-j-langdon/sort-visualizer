@@ -278,6 +278,27 @@ function isVisuallySettled() {
   return true;
 }
 
+let revealToken = 0;
+
+function animateReveal() {
+  const token = ++revealToken;
+  let lastTime = performance.now();
+
+  function frame(now) {
+    if (token !== revealToken) return;
+    const dt = now - lastTime;
+    lastTime = now;
+    let settled = true;
+    for (let i = 0; i < array.length; i++) {
+      displayValues[i] = approach(displayValues[i], array[i], dt, HEIGHT_EASE_MS);
+      if (Math.abs(displayValues[i] - array[i]) > 0.15) settled = false;
+    }
+    draw(now);
+    if (!settled) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
 function play() {
   if (animating) return Promise.resolve();
   ensureAudioContext();
@@ -373,15 +394,21 @@ function play() {
 shuffleBtn.addEventListener("click", () => {
   if (animating) return;
   stopShufflePulse();
-  resetArray();
-  draw();
+  array = randomArray(array.length);
+  highlightState.clear();
+  sortedIndices.clear();
+  animateReveal();
 });
 
 sizeSlider.addEventListener("input", () => {
   if (animating) return;
   stopShufflePulse();
-  resetArray();
-  draw();
+  const size = Number(sizeSlider.value);
+  array = randomArray(size);
+  displayValues = new Array(size).fill(0);
+  highlightState.clear();
+  sortedIndices.clear();
+  animateReveal();
 });
 
 playBtn.addEventListener("click", () => {
