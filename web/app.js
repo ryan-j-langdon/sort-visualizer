@@ -138,16 +138,18 @@ function draw(now) {
   const n = array.length;
   if (n === 0) return;
 
-  const gap = Math.min(3, w / n / 4);
-  const barWidth = Math.max(1, (w - gap * (n - 1)) / n);
+  const hPadding = 16;
+  const vPadding = 16;
+  const usableWidth = w - hPadding * 2;
+  const gap = Math.min(3, usableWidth / n / 4);
+  const barWidth = Math.max(1, (usableWidth - gap * (n - 1)) / n);
   const maxVal = Math.max(...array);
-  const padding = 16;
 
   ctx.shadowBlur = 0;
   for (let i = 0; i < n; i++) {
-    const barHeight = (displayValues[i] / maxVal) * (h - padding * 2);
-    const x = i * (barWidth + gap);
-    const y = h - padding - barHeight;
+    const barHeight = (displayValues[i] / maxVal) * (h - vPadding * 2);
+    const x = hPadding + i * (barWidth + gap);
+    const y = h - vPadding - barHeight;
     const kind = sortedIndices.has(i) ? "sorted" : "bar";
     const g = ctx.createLinearGradient(x, y, x, y + Math.max(1, barHeight));
     g.addColorStop(0, PALETTE[kind].top);
@@ -163,9 +165,9 @@ function draw(now) {
       continue;
     }
     const alpha = 1 - t * t * (3 - 2 * t);
-    const barHeight = (displayValues[i] / maxVal) * (h - padding * 2);
-    const x = i * (barWidth + gap);
-    const y = h - padding - barHeight;
+    const barHeight = (displayValues[i] / maxVal) * (h - vPadding * 2);
+    const x = hPadding + i * (barWidth + gap);
+    const y = h - vPadding - barHeight;
     const p = PALETTE[hi.color];
     ctx.save();
     ctx.globalAlpha = alpha;
