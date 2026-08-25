@@ -123,6 +123,11 @@ body {
   flex-direction: column;
   gap: 0.35rem;
   min-width: 140px;
+  transition: opacity 0.15s ease;
+}
+
+.control:has(input:disabled) {
+  opacity: 0.5;
 }
 
 .control-label {
@@ -196,6 +201,10 @@ input[type="range"]::-moz-range-thumb:active {
 
 input[type="range"]:focus-visible::-moz-range-thumb {
   box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.3);
+}
+
+input[type="range"]:disabled {
+  cursor: not-allowed;
 }
 
 .btn {
