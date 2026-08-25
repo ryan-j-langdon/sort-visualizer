@@ -348,11 +348,9 @@ function play() {
             array[step.i] = step.value_i;
           }
         }
-        for (let i = 0; i < n; i++) sortedIndices.add(i);
         highlightState.clear();
-        displayValues = array.slice();
-        sortDoneAt = now;
-        sweepCursor = n;
+        if (sortDoneAt === null) sortDoneAt = now;
+        finishRequested = false;
       } else if (stepIndex < steps.length) {
         const delay = speedToDelayMs();
         accumulator += dt;
