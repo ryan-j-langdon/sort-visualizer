@@ -84,6 +84,22 @@ let animating = false;
 let finishRequested = false;
 let bgGradient = null;
 let bgGradientH = -1;
+let shufflePulseTimeoutId = null;
+
+const SHUFFLE_PULSE_DELAY_MS = 1000;
+
+function scheduleShufflePulse() {
+  clearTimeout(shufflePulseTimeoutId);
+  shufflePulseTimeoutId = setTimeout(() => {
+    shuffleBtn.classList.add("pulse-highlight");
+  }, SHUFFLE_PULSE_DELAY_MS);
+}
+
+function stopShufflePulse() {
+  clearTimeout(shufflePulseTimeoutId);
+  shufflePulseTimeoutId = null;
+  shuffleBtn.classList.remove("pulse-highlight");
+}
 
 function randomArray(size) {
   const max = 100;
@@ -264,6 +280,7 @@ function isVisuallySettled() {
 function play() {
   if (animating) return Promise.resolve();
   ensureAudioContext();
+  stopShufflePulse();
   animating = true;
   finishRequested = false;
   setControlsDisabled(true);
@@ -344,6 +361,7 @@ function play() {
         setControlsDisabled(false);
         playBtn.classList.remove("is-animating");
         playBtn.setAttribute("aria-label", "Play");
+        scheduleShufflePulse();
         resolve();
       }
     }
@@ -353,12 +371,14 @@ function play() {
 
 shuffleBtn.addEventListener("click", () => {
   if (animating) return;
+  stopShufflePulse();
   resetArray();
   draw();
 });
 
 sizeSlider.addEventListener("input", () => {
   if (animating) return;
+  stopShufflePulse();
   resetArray();
   draw();
 });
