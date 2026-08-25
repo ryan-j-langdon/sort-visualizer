@@ -14,6 +14,8 @@ const ctx = canvas.getContext("2d");
 const algorithmSelect = document.getElementById("algorithm-select");
 const speedSlider = document.getElementById("speed-slider");
 const sizeSlider = document.getElementById("size-slider");
+const speedTooltip = document.getElementById("speed-tooltip");
+const sizeTooltip = document.getElementById("size-tooltip");
 const shuffleBtn = document.getElementById("shuffle-btn");
 const muteBtn = document.getElementById("mute-btn");
 const playBtn = document.getElementById("play-btn");
@@ -204,6 +206,15 @@ function speedToDelayMs() {
   // Apply an ease through the speed range while preserving the endpoints.
   const eased = t * t * t * (t * (t * 6 - 15) + 10);
   return maxDelay + (minDelay - maxDelay) * eased;
+}
+
+function syncSpeedTooltip() {
+  const speed = Number(speedSlider.value);
+  speedTooltip.textContent = `${(speed / 100).toFixed(2)}x`;
+}
+
+function syncSizeTooltip() {
+  sizeTooltip.textContent = `${sizeSlider.value} elements`;
 }
 
 function stepsToJS(vec) {
@@ -400,7 +411,31 @@ shuffleBtn.addEventListener("click", () => {
   animateReveal();
 });
 
+let draggingSliderControl = null;
+
+function beginSliderDrag(control) {
+  draggingSliderControl = control;
+  control.classList.add("is-dragging");
+}
+
+function endSliderDrag() {
+  if (draggingSliderControl) {
+    draggingSliderControl.classList.remove("is-dragging");
+    draggingSliderControl = null;
+  }
+}
+
+speedSlider.addEventListener("pointerdown", () => beginSliderDrag(speedSlider.closest(".control")));
+sizeSlider.addEventListener("pointerdown", () => beginSliderDrag(sizeSlider.closest(".control")));
+window.addEventListener("pointerup", endSliderDrag);
+window.addEventListener("pointercancel", endSliderDrag);
+
+speedSlider.addEventListener("input", () => {
+  syncSpeedTooltip();
+});
+
 sizeSlider.addEventListener("input", () => {
+  syncSizeTooltip();
   if (animating) return;
   stopShufflePulse();
   const size = Number(sizeSlider.value);
@@ -437,6 +472,8 @@ async function init() {
   resetArray();
   resizeCanvas();
   syncMuteButton();
+  syncSpeedTooltip();
+  syncSizeTooltip();
 }
 
 init();
