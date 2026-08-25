@@ -67,8 +67,13 @@ body {
   transition: border-color 0.15s var(--ease-standard), box-shadow 0.15s var(--ease-standard);
 }
 
-#algorithm-select:hover {
+#algorithm-select:not(:disabled):hover {
   border-color: var(--accent);
+}
+
+#algorithm-select:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 #algorithm-select:focus-visible {
@@ -126,7 +131,7 @@ body {
 }
 
 .control:has(input:disabled) {
-  opacity: 0.5;
+  opacity: 0.35;
 }
 
 .control-label {
@@ -199,7 +204,7 @@ input[type="range"]::-webkit-slider-thumb {
   transition: box-shadow 0.15s var(--ease-standard), transform 0.1s ease;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
+input[type="range"]:not(:disabled)::-webkit-slider-thumb:hover {
   box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.22);
 }
 
@@ -227,7 +232,7 @@ input[type="range"]::-moz-range-thumb {
   transition: box-shadow 0.15s var(--ease-standard), transform 0.1s ease;
 }
 
-input[type="range"]::-moz-range-thumb:hover {
+input[type="range"]:not(:disabled)::-moz-range-thumb:hover {
   box-shadow: 0 0 0 6px rgba(96, 165, 250, 0.22);
 }
 
@@ -257,7 +262,7 @@ input[type="range"]:disabled {
   transition: background 0.15s ease, transform 0.1s var(--ease-standard), border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn:hover {
+.btn:not(:disabled):hover {
   background: var(--surface-hover);
   border-color: var(--accent);
   transform: translateY(-1px);
@@ -273,7 +278,7 @@ input[type="range"]:disabled {
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none;
 }
