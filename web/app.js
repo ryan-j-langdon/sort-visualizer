@@ -122,6 +122,17 @@ function resizeCanvas() {
   draw();
 }
 
+const BAR_RADIUS = 4;
+
+function fillBar(x, y, width, height, radius) {
+  const h = Math.max(0, height);
+  if (h <= 0 || width <= 0) return;
+  const r = Math.min(radius, width / 2, h / 2);
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, h, [r, r, 0, 0]);
+  ctx.fill();
+}
+
 function draw(now) {
   if (now === undefined) now = performance.now();
   const w = canvas.clientWidth;
@@ -154,7 +165,7 @@ function draw(now) {
     g.addColorStop(0, PALETTE[kind].top);
     g.addColorStop(1, PALETTE[kind].bottom);
     ctx.fillStyle = g;
-    ctx.fillRect(x, y, barWidth, Math.max(0, barHeight));
+    fillBar(x, y, barWidth, barHeight, BAR_RADIUS);
   }
 
   for (const [i, hi] of highlightState) {
@@ -176,7 +187,7 @@ function draw(now) {
     g.addColorStop(0, p.top);
     g.addColorStop(1, p.bottom);
     ctx.fillStyle = g;
-    ctx.fillRect(x, y, barWidth, Math.max(0, barHeight));
+    fillBar(x, y, barWidth, barHeight, BAR_RADIUS);
     ctx.restore();
   }
 }
