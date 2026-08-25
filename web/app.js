@@ -100,10 +100,11 @@ function stopShufflePulse() {
 }
 
 function randomArray(size) {
-  const max = 100;
   const arr = new Array(size);
-  for (let i = 0; i < size; i++) {
-    arr[i] = 1 + Math.floor(Math.random() * max);
+  for (let i = 0; i < size; i++) arr[i] = i + 1;
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
@@ -250,7 +251,7 @@ function applyStep(step, now) {
     case Module.StepType.Compare.value:
       highlightState.set(step.i, { color: "compare", startTime: now, duration: HIGHLIGHT_FADE_MS });
       highlightState.set(step.j, { color: "compare", startTime: now, duration: HIGHLIGHT_FADE_MS });
-      playCompareSound((array[step.i] + array[step.j]) / 2);
+      playCompareSound((array[step.i] + array[step.j]) / 2, array.length);
       break;
     case Module.StepType.Swap.value: {
       const tmp = array[step.i];
@@ -258,13 +259,13 @@ function applyStep(step, now) {
       array[step.j] = tmp;
       highlightState.set(step.i, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
       highlightState.set(step.j, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
-      playSwapSound(array[step.i]);
+      playSwapSound(array[step.i], array.length);
       break;
     }
     case Module.StepType.Overwrite.value:
       array[step.i] = step.value_i;
       highlightState.set(step.i, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
-      playSwapSound(array[step.i]);
+      playSwapSound(array[step.i], array.length);
       break;
     case Module.StepType.SetSorted.value:
       sortedIndices.add(step.i);

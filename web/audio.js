@@ -41,8 +41,8 @@ function clamp01(x) {
   return x < 0 ? 0 : x > 1 ? 1 : x;
 }
 
-function valueToFreq(value, minFreq, maxFreq) {
-  const t = clamp01((value - 1) / 99);
+function valueToFreq(value, maxValue, minFreq, maxFreq) {
+  const t = clamp01((value - 1) / Math.max(1, maxValue - 1));
   return minFreq + (maxFreq - minFreq) * t;
 }
 
@@ -72,14 +72,14 @@ function playTone({ freq, type = "sine", duration = 0.05, peakGain = 0.2, attack
   };
 }
 
-export function playCompareSound(value) {
+export function playCompareSound(value, maxValue) {
   if (muted || !audioCtx || throttled()) return;
-  playTone({ freq: valueToFreq(value, 500, 1000), type: "sine", duration: 0.05, peakGain: 0.09, attack: 0.003 });
+  playTone({ freq: valueToFreq(value, maxValue, 500, 1000), type: "sine", duration: 0.05, peakGain: 0.09, attack: 0.003 });
 }
 
-export function playSwapSound(value) {
+export function playSwapSound(value, maxValue) {
   if (muted || !audioCtx || throttled()) return;
-  playTone({ freq: valueToFreq(value, 160, 420), type: "triangle", duration: 0.08, peakGain: 0.13, attack: 0.003 });
+  playTone({ freq: valueToFreq(value, maxValue, 160, 420), type: "triangle", duration: 0.08, peakGain: 0.13, attack: 0.003 });
 }
 
 export function playSweepTickSound(progress) {
