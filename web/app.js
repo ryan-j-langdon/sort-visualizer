@@ -319,6 +319,7 @@ function play() {
   setControlsDisabled(true);
   playBtn.classList.add("is-animating");
   playBtn.setAttribute("aria-label", "Finish sort");
+  playBtn.setAttribute("title", "Finish");
 
   const steps = runSort(algorithmSelect.value, array.slice());
   highlightState.clear();
@@ -392,6 +393,7 @@ function play() {
         setControlsDisabled(false);
         playBtn.classList.remove("is-animating");
         playBtn.setAttribute("aria-label", "Play");
+        playBtn.setAttribute("title", "Play");
         scheduleShufflePulse();
         resolve();
       }
@@ -456,6 +458,7 @@ function syncMuteButton() {
   const muted = isMuted();
   muteBtn.classList.toggle("is-muted", muted);
   muteBtn.setAttribute("aria-label", muted ? "Unmute sound effects" : "Mute sound effects");
+  muteBtn.setAttribute("title", muted ? "Unmute" : "Mute");
 }
 
 muteBtn.addEventListener("click", () => {
