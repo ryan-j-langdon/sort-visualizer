@@ -24,9 +24,7 @@ function cssVar(name, fallback) {
 }
 
 const COLORS = {
-  background: cssVar("--color-viz-bg", "#1e3a8a"),
-  backgroundTop: cssVar("--color-viz-bg-top", "#1e40af"),
-  bar: cssVar("--color-bar", "#f8fafc"),
+  bar: cssVar("--color-bar", "#60a5fa"),
   compare: cssVar("--color-compare", "#fbbf24"),
   swap: cssVar("--color-swap", "#f87171"),
   sorted: cssVar("--color-sorted", "#34d399"),
@@ -82,8 +80,6 @@ let highlightState = new Map();
 let sortedIndices = new Set();
 let animating = false;
 let finishRequested = false;
-let bgGradient = null;
-let bgGradientH = -1;
 let shufflePulseTimeoutId = null;
 
 const SHUFFLE_PULSE_DELAY_MS = 1000;
@@ -118,7 +114,6 @@ function resizeCanvas() {
   canvas.style.width = `${rect.width}px`;
   canvas.style.height = `${rect.height}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  bgGradientH = -1;
   draw();
 }
 
@@ -138,14 +133,7 @@ function draw(now) {
   const w = canvas.clientWidth;
   const h = canvas.clientHeight;
 
-  if (!bgGradient || bgGradientH !== h) {
-    bgGradient = ctx.createLinearGradient(0, 0, 0, h);
-    bgGradient.addColorStop(0, COLORS.backgroundTop);
-    bgGradient.addColorStop(1, COLORS.background);
-    bgGradientH = h;
-  }
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, w, h);
+  ctx.clearRect(0, 0, w, h);
 
   const n = array.length;
   if (n === 0) return;

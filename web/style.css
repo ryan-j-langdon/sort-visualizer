@@ -12,9 +12,7 @@
   --radius-md: 12px;
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --color-viz-bg: #1e3a8a;
-  --color-viz-bg-top: #1e40af;
-  --color-bar: #f8fafc;
+  --color-bar: var(--accent);
   --color-compare: #fbbf24;
   --color-swap: #f87171;
   --color-sorted: #34d399;
@@ -315,11 +313,12 @@ input[type="range"]:disabled {
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  margin: 0 1.5rem 1.5rem;
+  margin: 0.5rem 2rem 2rem;
+  border: 2px solid var(--accent);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--color-viz-bg-top);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 24px rgba(0, 0, 0, 0.35);
+  background: transparent;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   min-height: 0;
 }
 
