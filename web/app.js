@@ -71,6 +71,7 @@ let displayValues = [];
 let highlightState = new Map();
 let sortedIndices = new Set();
 let animating = false;
+let finishRequested = false;
 let bgGradient = null;
 let bgGradientH = -1;
 
@@ -173,7 +174,9 @@ function speedToDelayMs() {
   const minDelay = 0.5;
   const maxDelay = 180;
   const t = (speed - 1) / 99;
-  return maxDelay - t * (maxDelay - minDelay);
+  // Apply an ease through the speed range while preserving the endpoints.
+  const eased = t * t * t * (t * (t * 6 - 15) + 10);
+  return maxDelay + (minDelay - maxDelay) * eased;
 }
 
 function stepsToJS(vec) {
@@ -248,8 +251,10 @@ function isVisuallySettled() {
 function play() {
   if (animating) return Promise.resolve();
   animating = true;
+  finishRequested = false;
   setControlsDisabled(true);
-  playBtn.disabled = true;
+  playBtn.classList.add("is-animating");
+  playBtn.setAttribute("aria-label", "Finish sort");
 
   const steps = runSort(algorithmSelect.value, array.slice());
   highlightState.clear();
@@ -267,7 +272,23 @@ function play() {
       const dt = now - lastTime;
       lastTime = now;
 
-      if (stepIndex < steps.length) {
+      if (finishRequested) {
+        for (; stepIndex < steps.length; stepIndex++) {
+          const step = steps[stepIndex];
+          if (step.type === Module.StepType.Swap.value) {
+            const tmp = array[step.i];
+            array[step.i] = array[step.j];
+            array[step.j] = tmp;
+          } else if (step.type === Module.StepType.Overwrite.value) {
+            array[step.i] = step.value_i;
+          }
+        }
+        for (let i = 0; i < n; i++) sortedIndices.add(i);
+        highlightState.clear();
+        displayValues = array.slice();
+        sortDoneAt = now;
+        sweepCursor = n;
+      } else if (stepIndex < steps.length) {
         const delay = speedToDelayMs();
         accumulator += dt;
         while (accumulator >= delay && stepIndex < steps.length) {
@@ -298,8 +319,10 @@ function play() {
         requestAnimationFrame(frame);
       } else {
         animating = false;
+        finishRequested = false;
         setControlsDisabled(false);
-        playBtn.disabled = false;
+        playBtn.classList.remove("is-animating");
+        playBtn.setAttribute("aria-label", "Play");
         resolve();
       }
     }
@@ -320,7 +343,11 @@ sizeSlider.addEventListener("input", () => {
 });
 
 playBtn.addEventListener("click", () => {
-  play();
+  if (animating) {
+    finishRequested = true;
+  } else {
+    play();
+  }
 });
 
 window.addEventListener("resize", resizeCanvas);
