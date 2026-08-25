@@ -235,6 +235,18 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   display: inline-flex;
 }
 
+.btn-mute .icon-sound-off {
+  display: none;
+}
+
+.btn-mute.is-muted .icon-sound-on {
+  display: none;
+}
+
+.btn-mute.is-muted .icon-sound-off {
+  display: inline-flex;
+}
+
 .viz-container {
   flex: 1;
   display: flex;

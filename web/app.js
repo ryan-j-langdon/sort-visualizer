@@ -1,4 +1,13 @@
 import createSortModule from "./dist/sort.mjs";
+import {
+  ensureAudioContext,
+  playCompareSound,
+  playSwapSound,
+  playSweepTickSound,
+  playFinishTune,
+  setMuted,
+  isMuted,
+} from "./audio.js";
 
 const canvas = document.getElementById("viz-canvas");
 const ctx = canvas.getContext("2d");
@@ -6,6 +15,7 @@ const algorithmSelect = document.getElementById("algorithm-select");
 const speedSlider = document.getElementById("speed-slider");
 const sizeSlider = document.getElementById("size-slider");
 const shuffleBtn = document.getElementById("shuffle-btn");
+const muteBtn = document.getElementById("mute-btn");
 const playBtn = document.getElementById("play-btn");
 
 function cssVar(name, fallback) {
@@ -212,6 +222,7 @@ function applyStep(step, now) {
     case Module.StepType.Compare.value:
       highlightState.set(step.i, { color: "compare", startTime: now, duration: HIGHLIGHT_FADE_MS });
       highlightState.set(step.j, { color: "compare", startTime: now, duration: HIGHLIGHT_FADE_MS });
+      playCompareSound((array[step.i] + array[step.j]) / 2);
       break;
     case Module.StepType.Swap.value: {
       const tmp = array[step.i];
@@ -219,11 +230,13 @@ function applyStep(step, now) {
       array[step.j] = tmp;
       highlightState.set(step.i, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
       highlightState.set(step.j, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
+      playSwapSound(array[step.i]);
       break;
     }
     case Module.StepType.Overwrite.value:
       array[step.i] = step.value_i;
       highlightState.set(step.i, { color: "swap", startTime: now, duration: HIGHLIGHT_FADE_MS });
+      playSwapSound(array[step.i]);
       break;
     case Module.StepType.SetSorted.value:
       sortedIndices.add(step.i);
@@ -250,6 +263,7 @@ function isVisuallySettled() {
 
 function play() {
   if (animating) return Promise.resolve();
+  ensureAudioContext();
   animating = true;
   finishRequested = false;
   setControlsDisabled(true);
@@ -265,6 +279,7 @@ function play() {
   let accumulator = 0;
   let sortDoneAt = null;
   let sweepCursor = 0;
+  let finishTuneFired = false;
   const n = array.length;
 
   return new Promise((resolve) => {
@@ -303,8 +318,15 @@ function play() {
         while (sweepCursor < targetCursor) {
           sortedIndices.add(sweepCursor);
           highlightState.set(sweepCursor, { color: "sweep", startTime: now, duration: SWEEP_FADE_MS });
+          playSweepTickSound(sweepCursor / n);
           sweepCursor++;
         }
+      }
+
+      const sweepDone = sortDoneAt !== null && sweepCursor >= n;
+      if (sweepDone && !finishTuneFired) {
+        finishTuneFired = true;
+        playFinishTune();
       }
 
       for (let i = 0; i < array.length; i++) {
@@ -312,7 +334,6 @@ function play() {
       }
       draw(now);
 
-      const sweepDone = sortDoneAt !== null && sweepCursor >= n;
       const finished = stepIndex >= steps.length && sweepDone && isVisuallySettled();
 
       if (!finished) {
@@ -350,12 +371,24 @@ playBtn.addEventListener("click", () => {
   }
 });
 
+function syncMuteButton() {
+  const muted = isMuted();
+  muteBtn.classList.toggle("is-muted", muted);
+  muteBtn.setAttribute("aria-label", muted ? "Unmute sound effects" : "Mute sound effects");
+}
+
+muteBtn.addEventListener("click", () => {
+  setMuted(!isMuted());
+  syncMuteButton();
+});
+
 window.addEventListener("resize", resizeCanvas);
 
 async function init() {
   Module = await createSortModule();
   resetArray();
   resizeCanvas();
+  syncMuteButton();
 }
 
 init();
